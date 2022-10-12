@@ -22,13 +22,15 @@ require_once ('function.php');
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Edit work</h4>
-                    <form action="update.php" method="post">
+                    <h4 class="card-title">Edit status work</h4>
+                    <form action="complup.php" method="post">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="work_name" value="<?= $work['work_name']?>" >
-                        </div>
+                            <select name="work_status" value="<?= $work['work_status']?>">
+                                <option value="0">Невыполнено</option>
+                                <option value="1">Выполнено</option>
+                            </select>
                         <input type="hidden"  name="id" value="<?= $work['id']?>" >
-                        <button type="submit" name="editWorks" class="btn btn-primary">Submit</button>
+                        <button type="submit" name="complWorks" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
             </div>

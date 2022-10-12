@@ -2,6 +2,6 @@
 include("function.php");
 if (isset($_GET['id'])){
     $id = (int)$_GET['id'];
-    complWork($id);
+    $work = getWorkByid($id);
+    include ('pagecompl.php');
 }
-header("Location: index.php");

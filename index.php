@@ -41,13 +41,11 @@ require_once ('function.php');
                     <h4 class="card-title">Work List</h4>
                     <p class="card-text">Список важных дел</p>
                 </div>
-                <ul class="list-group list-group-flush">
-
-
-                    <?= showWorkList() ?>
-
-
-                </ul>
+                <li class="list-group-item list-group-item-info">
+                    <ul class="list-group list-group-flush">
+                        <?= showWorkList() ?>
+                    </ul>
+                </li>
             </div>
         </div>
     </div>

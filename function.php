@@ -4,22 +4,6 @@ function connectDB(){
     $dbh = new PDO('mysql:host=localhost; dbname=todo', 'root', '');
     return $dbh;
 }
-/*function showForm(string $action, string $title, string $value =''){
-    $form = <<< EOL
-        <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">$title</h4>
-                        <form action="$action" method="post">
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="work" value="$value">
-                            </div>
-                            <button type="submit" name="btnWork" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
-                </div>
-    EOL;
-    return $form;
-}*/
 function getAllWorks(){
     $dbh = connectDB();
     $worklist = $dbh->query('SELECT * from worklist')
@@ -59,10 +43,13 @@ function addNewWork(){
         die();
 
     }
-    function complWork(int $id){
+    function complWork(int $id, int $work_status){
     $dbh = connectDB();
-    $query = "UPDATE `worklist` set `work_status` = '1' WHERE ((`id` = :id))";
-    $params = [':id' => $id];
+    $query = "UPDATE `worklist` set `work_status` = :work_status WHERE ((`id` = :id))";
+    $params = [
+        ':id' => $id,
+        'work_status' => $work_status
+    ];
     $stmt = $dbh->prepare($query) ;
     $stmt ->execute($params) ;
     $dbh = null;
