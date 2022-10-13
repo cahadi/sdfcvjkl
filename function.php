@@ -44,11 +44,17 @@ function addNewWork(){
 
     }
     function complWork(int $id, int $work_status){
+    if($work_status ==1){
+        $status = 0;
+    }
+    else{
+        $status = 1;
+    }
     $dbh = connectDB();
     $query = "UPDATE `worklist` set `work_status` = :work_status WHERE ((`id` = :id))";
     $params = [
         ':id' => $id,
-        'work_status' => $work_status
+        'work_status' => $status
     ];
     $stmt = $dbh->prepare($query) ;
     $stmt ->execute($params) ;
@@ -56,6 +62,7 @@ function addNewWork(){
     header("Location: index.php");
     die();
 }
+
 
 function delWork(int $id){
     $dbh = connectDB();
@@ -71,10 +78,14 @@ function delWork(int $id){
 function generateHtmlWorkList(array $worklist){
     $html = '';
     foreach ($worklist as $row) {
-        $html .= <<<EOT
-            <li class="list-group-item  ">
+        $html .= '<li class="list-group-item';
+        if ($row['work_status'] == 1){
+            $html .= ' list-group-item-info';
+        }
+            $html .='">';
+        $html .= <<<EOP
                 {$row['work_name']} 
-                <a href="to_complete.php?id={$row['id']}"class="btn btn-outline-success btn-sm ml-5">
+                <a href="to_complete.php?id={$row['id']}" class="btn btn-outline-success btn-sm ml-5">
                     <span><i class="fas fa-check-circle "></i></span>
                 </a>
                 <a href="edit.php?id={$row['id']}" class="btn  btn-outline-primary btn-sm">
@@ -84,7 +95,7 @@ function generateHtmlWorkList(array $worklist){
                     <i class="fas fa-trash-alt"></i>
                 </a>
             </li>
-EOT;
+EOP;
     };
     return $html;
 }

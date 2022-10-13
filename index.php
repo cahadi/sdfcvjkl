@@ -41,7 +41,7 @@ require_once ('function.php');
                     <h4 class="card-title">Work List</h4>
                     <p class="card-text">Список важных дел</p>
                 </div>
-                <li class="list-group-item list-group-item-info">
+                <li class="list-group-item ">
                     <ul class="list-group list-group-flush">
                         <?= showWorkList() ?>
                     </ul>
