@@ -1,73 +1,105 @@
 <?php
-require_once ('function.php');
-?><!doctype html>
-<html lang="en">
-<head>
-    <title>Title</title>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+session_start();
+require __DIR__ . '/vendor/autoload.php';
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css"
-          integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
-
-</head>
-<body>
-
-<div class="container">
-    <div class="row my-2">
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Add new work</h4>
-                    <form action="add.php" method="post">
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="work" >
-                        </div>
-                        <button type="submit" name="addWork" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h4 class="card-title">Work List</h4>
-                    <p class="card-text">Список важных дел</p>
-                </div>
-                <li class="list-group-item ">
-                    <ul class="list-group list-group-flush">
-                        <?= showWorkList() ?>
-                    </ul>
-                </li>
-            </div>
-        </div>
-    </div>
-
-</div>
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
+use Tracy\Debugger;
+
+Debugger::enable();
+
+$router   = require ('app/config/config.php');
+
+$request = Laminas\Diactoros\ServerRequestFactory::fromGlobals(
+    $_SERVER, $_GET, $_POST, $_COOKIE, $_FILES
+);
+
+$router->map('GET', '/', 'App\FrontEndController::index');
+$router->map('GET', '/article/{id:number}', 'App\FrontEndController::article');
 
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-<script defer src="https://use.fontawesome.com/releases/v5.1.1/js/all.js"
-        integrity="sha384-BtvRZcyfv4r0x/phJt9Y9HhnN5ur1Z+kZbKVgzVBAlQZX4jvAuImlIz+bG7TS00a"
-        crossorigin="anonymous"></script>
-</body>
-</html>
+$router->map('GET', '/signin', 'App\BackEndController::showSignInForm');
+$router->map('POST', '/signin', 'App\BackEndController::UserSignIn');
+$router->map('GET', '/signup', 'App\BackEndController::showSignUpForm');
+$router->map('POST', '/signup', 'App\BackEndController::UserSignUp');
+
+$router->group('/admin', function (\League\Route\RouteGroup $router) {
+    $router->map('GET', '/', 'App\BackEndController::index');
+    $router->map('GET', '/logout', 'App\BackEndController::userLogOut');
+    $router->map('GET', '/filemanager', 'App\BackEndController::filemanager');
+    $router->map('GET', '/users', 'App\BackEndController::showUsersList');
+
+    $router->map('GET', '/articles', 'App\BackEndController::showArticlesList');
+    $router->map('GET', '/article-add', 'App\BackEndController::showAddArticleForm');
+    $router->map('POST', '/article-add', 'App\BackEndController::insertArticle');
+
+    $router->map(
+        'GET',
+        '/article-edit/{id:number}',
+        'App\BackEndController::showUpdateArticleForm'
+    );
+    $router->map(
+        'POST',
+        '/article-update/{id:number}',
+        'App\BackEndController::updateArticle'
+    );
+    $router->map(
+        'GET',
+        '/article-get-del-id/{id:number}',
+        'App\BackEndController::deleArticle'
+    );
+    $router->map(
+        'POST',
+        'article-delete/{id:number}',
+        'App/BackEndController::deleteArticle'
+    );
+
+    $router->map('GET', '/tags', 'App\BackEndController::showTagsList');
+    $router->map('GET', '/tag-add', 'App\BackEndController::showAddTagForm');
+    $router->map('POST', '/tag-add', 'App\BackEndController::insertTag');
+
+    $router->map(
+        'GET',
+        '/tag-edit/{id:number}',
+        'App\BackEndController::showUpdateTagForm'
+    );
+    $router->map(
+        'POST',
+        '/tag-update/{id:number}',
+        'App\BackEndController::updateTag'
+    );
+    $router->map(
+        'POST',
+        'tag-delete/{id:number}',
+        'App/BackEndController::deleteTag'
+    );
+
+    $router->map('GET', '/categories', 'App\BackEndController::showCategoriesList');
+    $router->map('GET', '/category-add', 'App\BackEndController::showAddCategoryForm');
+    $router->map('POST', '/category-add', 'App\BackEndController::insertCategory');
+
+    $router->map(
+        'GET',
+        '/category-edit/{id:number}',
+        'App\BackEndController::showUpdateCategoryForm'
+    );
+    $router->map(
+        'POST',
+        '/category-update/{id:number}',
+        'App\BackEndController::updateCategory'
+    );
+    $router->map(
+        'POST',
+        'category-delete/{id:number}',
+        'App/BackEndController::deleteCategory'
+    );
+
+})->middleware(new \App\Middleware\AuthMiddleware);
+
+$response = $router->dispatch($request);
+
+// send the response to the browser
+(new Laminas\HttpHandlerRunner\Emitter\SapiEmitter)->emit($response);
